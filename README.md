@@ -2,6 +2,8 @@
 
 A Python tool for generating hexaflexagon templates from images.
 
+See the demo video: http://www.youtube.com/watch?v=alQW71N2hoM
+
 ## What is a Hexaflexagon?
 
 A hexaflexagon is a fascinating paper folding toy that can be "flexed" to reveal different faces. It's a six-sided polygon that can be manipulated to show different images on its surface. When you flex a hexaflexagon, hidden faces are revealed while others disappear, creating an engaging interactive experience. See [Flexagon - Wikipedia](https://en.wikipedia.org/wiki/Flexagon) for more details about flexagons.
