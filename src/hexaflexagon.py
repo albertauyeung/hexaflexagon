@@ -1,7 +1,10 @@
 from PIL import Image, ImageDraw, ImageOps
 import math
 
-from utils import draw_dash_line, rotate_and_crop
+try:
+    from .utils import draw_dash_line, rotate_and_crop
+except ImportError:
+    from utils import draw_dash_line, rotate_and_crop
 
 
 class HexaflexagonGenerator:

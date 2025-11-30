@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Folding Instructions - Hexaflexagon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: #764ba2;
+        }
+
+        .back-link::before {
+            content: '← ';
+        }
+
+        .step {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .step:last-child {
+            border-bottom: none;
+        }
+
+        .step h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .step p {
+            color: #495057;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .step img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 10px;
+        }
+
+        .video-link {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .video-link p {
+            color: #495057;
+            margin-bottom: 15px;
+        }
+
+        .video-link a {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .video-link a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .step h2 {
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Folding Instructions</h1>
+            <p>Follow these steps to create your hexaflexagon</p>
+        </div>
+
+        <div class="content">
+            <a href="/" class="back-link">Back to Generator</a>
+
+            <div class="step">
+                <h2>Step 1: Cut Out the Template</h2>
+                <p>Cut out the hexaflexagon shape along the outer solid lines.</p>
+                <img src="/assets/folding_1.jpg" alt="Step 1: Cut out the template">
+            </div>
+
+            <div class="step">
+                <h2>Step 2: First Fold</h2>
+                <p>Fold along the long horizontal dashed line in the middle.</p>
+                <img src="/assets/folding_2.jpg" alt="Step 2: First fold">
+            </div>
+
+            <div class="step">
+                <h2>Step 3: Second Fold</h2>
+                <p>Fold along the second line as indicated in the first image above.</p>
+                <img src="/assets/folding_3.jpg" alt="Step 3: Second fold">
+            </div>
+
+            <div class="step">
+                <h2>Step 4: Third Fold</h2>
+                <p>Fold along the third line as indicated in the first image above to the back.</p>
+                <img src="/assets/folding_4.jpg" alt="Step 4: Third fold">
+            </div>
+
+            <div class="step">
+                <h2>Step 5: Check Your Progress</h2>
+                <p>Now, you should see one of your images displayed as shown below.</p>
+                <img src="/assets/folding_5.jpg" alt="Step 5: Check your progress">
+            </div>
+
+            <div class="step">
+                <h2>Step 6: Final Assembly</h2>
+                <p>Fold the white triangle flap inward along the dashed line, and then glue it to the other white triangle underneath.</p>
+                <img src="/assets/folding_6.jpg" alt="Step 6: Final assembly">
+            </div>
+
+            <div class="step">
+                <h2>Step 7: Finished!</h2>
+                <p>You're done! Now you can flex your hexaflexagon to reveal the different faces with your images.</p>
+            </div>
+
+            <div class="video-link">
+                <p>Watch this video to see how to flex through the different faces:</p>
+                <a href="http://www.youtube.com/watch?v=alQW71N2hoM" target="_blank">Watch Demo Video</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

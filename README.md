@@ -1,6 +1,6 @@
 # Hexaflexagon Generator
 
-A Python tool for generating hexaflexagon templates from images.
+A web application and Python tool for generating hexaflexagon templates from images.
 
 See the demo video: http://www.youtube.com/watch?v=alQW71N2hoM
 
@@ -12,7 +12,12 @@ A hexaflexagon is a fascinating paper folding toy that can be "flexed" to reveal
 
 ## Project Overview
 
-This project implements in Python a hexaflexagon generator that takes three input images and creates a printable template. The generator:
+This project provides two ways to generate hexaflexagon templates:
+
+1. **Web Application**: A sleek, user-friendly web interface built with FastAPI
+2. **Command-Line Tool**: A Python script for batch processing
+
+The hexaflexagon generator:
 
 - **Accepts 3 different images** as input
 - **Automatically crops and scales** images to fit hexagonal segments
@@ -36,11 +41,31 @@ cd hexaflexagon
 uv sync
 ```
 
-This will create a virtual environment and install all required dependencies, including Pillow for image processing.
+This will create a virtual environment and install all required dependencies, including Pillow for image processing and FastAPI for the web application.
 
 ## Usage
 
-### Basic Usage
+### Web Application
+
+Run the web application locally:
+
+```bash
+uv run uvicorn src.app:app --reload --port 8080
+```
+
+Then open your browser to http://localhost:8080
+
+The web interface provides:
+- Drag-and-drop or click-to-upload for three images
+- Adjustable quality/size settings
+- Instant download of generated templates
+- Integrated folding instructions
+
+**Deploying to Google Cloud Run**: See [DEPLOYMENT.md](DEPLOYMENT.md) for complete deployment instructions.
+
+### Command-Line Interface
+
+For batch processing or automation, use the command-line tool:
 
 To generate a hexaflexagon template, run the program with three image files:
 
@@ -83,13 +108,22 @@ uv run src/main.py face1.jpg face2.png face3.jpg my_hexaflexagon.png 300
 ```
 hexaflexagon/
 ├── src/
+│   ├── app.py             # FastAPI web application
 │   ├── hexaflexagon.py    # Main HexaflexagonGenerator class
 │   ├── main.py            # Command-line interface
 │   └── utils.py           # Utility functions for image processing
+├── static/
+│   ├── index.html         # Main web interface
+│   └── instructions.html  # Folding instructions page
+├── assets/                # Folding instruction images
+│   ├── folding_1.jpg
+│   └── ...
 ├── images/                # Sample images
 │   ├── dublin.png
 │   ├── london.png
 │   └── paris.png
+├── Dockerfile             # Container configuration for Cloud Run
+├── DEPLOYMENT.md          # Cloud Run deployment guide
 ├── pyproject.toml         # Project configuration and dependencies
 ├── uv.lock                # Dependency lock file
 └── README.md              # This file
@@ -107,6 +141,9 @@ The current implementation supports 3 images, but the architecture is designed t
 
 - Python ≥ 3.12
 - Pillow ≥ 11.3.0 (automatically installed via uv)
+- FastAPI ≥ 0.115.0 (for web application)
+- Uvicorn ≥ 0.32.0 (for web server)
+- Docker (for Cloud Run deployment)
 
 ## License
 

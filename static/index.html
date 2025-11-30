@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hexaflexagon Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+
+        .instructions h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 1.8;
+            color: #495057;
+        }
+
+        .upload-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .upload-box {
+            border: 3px dashed #dee2e6;
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            background: #f8f9fa;
+        }
+
+        .upload-box:hover {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
+
+        .upload-box.has-image {
+            border-color: #28a745;
+            background: #f0fff4;
+        }
+
+        .upload-box input[type="file"] {
+            display: none;
+        }
+
+        .upload-box label {
+            cursor: pointer;
+            display: block;
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .upload-box h3 {
+            color: #495057;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .upload-box p {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .preview-img {
+            max-width: 100%;
+            max-height: 150px;
+            margin-top: 10px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .upload-box.has-image .preview-img {
+            display: block;
+        }
+
+        .upload-box.has-image .upload-icon {
+            display: none;
+        }
+
+        .controls {
+            margin-bottom: 30px;
+        }
+
+        .controls label {
+            display: block;
+            margin-bottom: 8px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .controls input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: #dee2e6;
+            outline: none;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+
+        .controls input[type="range"]::-webkit-slider-thumb {
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        .controls .value-display {
+            text-align: center;
+            color: #667eea;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .generate-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc3545;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        .info-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .info-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .info-link a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .upload-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Hexaflexagon Generator</h1>
+            <p>Create your own hexaflexagon from three images</p>
+        </div>
+
+        <div class="content">
+            <div class="instructions">
+                <h2>How it works</h2>
+                <ol>
+                    <li>Upload three images below (JPEG, PNG, or WebP)</li>
+                    <li>Adjust the quality setting if needed</li>
+                    <li>Click "Generate Hexaflexagon" to create your template</li>
+                    <li>Print the template, cut it out, and fold it to create your hexaflexagon</li>
+                </ol>
+            </div>
+
+            <div class="error" id="errorMessage"></div>
+
+            <form id="uploadForm">
+                <div class="upload-section">
+                    <div class="upload-box" id="box1">
+                        <label for="image1">
+                            <div class="upload-icon">📷</div>
+                            <h3>Image 1</h3>
+                            <p>Click to upload</p>
+                            <img class="preview-img" id="preview1" alt="Preview 1">
+                        </label>
+                        <input type="file" id="image1" name="image1" accept="image/jpeg,image/png,image/webp" required>
+                    </div>
+
+                    <div class="upload-box" id="box2">
+                        <label for="image2">
+                            <div class="upload-icon">📷</div>
+                            <h3>Image 2</h3>
+                            <p>Click to upload</p>
+                            <img class="preview-img" id="preview2" alt="Preview 2">
+                        </label>
+                        <input type="file" id="image2" name="image2" accept="image/jpeg,image/png,image/webp" required>
+                    </div>
+
+                    <div class="upload-box" id="box3">
+                        <label for="image3">
+                            <div class="upload-icon">📷</div>
+                            <h3>Image 3</h3>
+                            <p>Click to upload</p>
+                            <img class="preview-img" id="preview3" alt="Preview 3">
+                        </label>
+                        <input type="file" id="image3" name="image3" accept="image/jpeg,image/png,image/webp" required>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <label for="imageSize">Template Quality</label>
+                    <input type="range" id="imageSize" name="imageSize" min="300" max="1000" value="500" step="50">
+                    <div class="value-display"><span id="sizeValue">500</span> pixels</div>
+                </div>
+
+                <button type="submit" class="generate-btn" id="generateBtn">Generate Hexaflexagon</button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Generating your hexaflexagon...</p>
+            </div>
+
+            <div class="info-link">
+                <a href="/instructions">View folding instructions</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Preview images
+        function setupImagePreview(inputId, previewId, boxId) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+            const box = document.getElementById(boxId);
+
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        box.classList.add('has-image');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        setupImagePreview('image1', 'preview1', 'box1');
+        setupImagePreview('image2', 'preview2', 'box2');
+        setupImagePreview('image3', 'preview3', 'box3');
+
+        // Update size display
+        const sizeSlider = document.getElementById('imageSize');
+        const sizeValue = document.getElementById('sizeValue');
+        sizeSlider.addEventListener('input', function() {
+            sizeValue.textContent = this.value;
+        });
+
+        // Handle form submission
+        const form = document.getElementById('uploadForm');
+        const generateBtn = document.getElementById('generateBtn');
+        const loading = document.getElementById('loading');
+        const errorMessage = document.getElementById('errorMessage');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Hide error message
+            errorMessage.classList.remove('active');
+
+            // Check if all images are uploaded
+            const image1 = document.getElementById('image1').files[0];
+            const image2 = document.getElementById('image2').files[0];
+            const image3 = document.getElementById('image3').files[0];
+
+            if (!image1 || !image2 || !image3) {
+                errorMessage.textContent = 'Please upload all three images';
+                errorMessage.classList.add('active');
+                return;
+            }
+
+            // Show loading state
+            generateBtn.disabled = true;
+            loading.classList.add('active');
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('image1', image1);
+            formData.append('image2', image2);
+            formData.append('image3', image3);
+            formData.append('image_size', sizeSlider.value);
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to generate hexaflexagon');
+                }
+
+                // Download the file
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'hexaflexagon.png';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+            } catch (error) {
+                errorMessage.textContent = error.message;
+                errorMessage.classList.add('active');
+            } finally {
+                generateBtn.disabled = false;
+                loading.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
