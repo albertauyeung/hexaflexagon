@@ -323,9 +323,90 @@ To delete the service and save costs:
 gcloud run services delete hexaflexagon-generator --region us-central1
 ```
 
+## Continuous Deployment with GitHub Actions
+
+The repo ships a workflow at `.github/workflows/deploy.yml` that deploys to Cloud Run on every push to `main`. It uses Workload Identity Federation, so no long-lived service account keys are stored in GitHub.
+
+### One-time setup
+
+Run these commands locally once. Replace the placeholders.
+
+```bash
+export PROJECT_ID=<your-gcp-project-id>
+export PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')
+export GITHUB_REPO=albertauyeung/hexaflexagon
+export SA_NAME=github-deployer
+export POOL=github-pool
+export PROVIDER=github-provider
+
+# Enable APIs
+gcloud services enable \
+  run.googleapis.com \
+  cloudbuild.googleapis.com \
+  artifactregistry.googleapis.com \
+  iamcredentials.googleapis.com \
+  --project "$PROJECT_ID"
+
+# Create the deployer service account
+gcloud iam service-accounts create "$SA_NAME" \
+  --display-name="GitHub Actions deployer" \
+  --project "$PROJECT_ID"
+
+export SA_EMAIL="$SA_NAME@$PROJECT_ID.iam.gserviceaccount.com"
+
+# Roles needed to build with Cloud Build and deploy to Cloud Run
+for role in roles/run.admin roles/cloudbuild.builds.editor \
+            roles/artifactregistry.writer roles/storage.admin \
+            roles/iam.serviceAccountUser roles/logging.viewer; do
+  gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+    --member="serviceAccount:$SA_EMAIL" --role="$role"
+done
+
+# Create a Workload Identity Pool + GitHub OIDC provider
+gcloud iam workload-identity-pools create "$POOL" \
+  --project="$PROJECT_ID" --location=global \
+  --display-name="GitHub Actions pool"
+
+gcloud iam workload-identity-pools providers create-oidc "$PROVIDER" \
+  --project="$PROJECT_ID" --location=global \
+  --workload-identity-pool="$POOL" \
+  --display-name="GitHub OIDC" \
+  --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository,attribute.repository_owner=assertion.repository_owner" \
+  --attribute-condition="assertion.repository_owner=='${GITHUB_REPO%%/*}'" \
+  --issuer-uri="https://token.actions.githubusercontent.com"
+
+# Allow the GitHub repo to impersonate the service account
+gcloud iam service-accounts add-iam-policy-binding "$SA_EMAIL" \
+  --project="$PROJECT_ID" \
+  --role=roles/iam.workloadIdentityUser \
+  --member="principalSet://iam.googleapis.com/projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/$POOL/attribute.repository/$GITHUB_REPO"
+
+# Print the values to paste into GitHub
+echo "WIF_PROVIDER=projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/$POOL/providers/$PROVIDER"
+echo "WIF_SERVICE_ACCOUNT=$SA_EMAIL"
+echo "GCP_PROJECT_ID=$PROJECT_ID"
+```
+
+### GitHub repository configuration
+
+In **Settings → Secrets and variables → Actions → Variables** add three repository variables:
+
+| Name | Value |
+|---|---|
+| `GCP_PROJECT_ID` | your project ID |
+| `WIF_PROVIDER` | `projects/<PROJECT_NUMBER>/locations/global/workloadIdentityPools/github-pool/providers/github-provider` |
+| `WIF_SERVICE_ACCOUNT` | `github-deployer@<PROJECT_ID>.iam.gserviceaccount.com` |
+
+(They're variables, not secrets — none of these values are sensitive.)
+
+### Trigger a deploy
+
+Push to `main`, or run the workflow manually from the **Actions** tab.
+
 ## Additional Resources
 
 - [Cloud Run Documentation](https://cloud.google.com/run/docs)
 - [Cloud Run Pricing](https://cloud.google.com/run/pricing)
 - [FastAPI Deployment Best Practices](https://fastapi.tiangolo.com/deployment/)
 - [Container Image Best Practices](https://cloud.google.com/architecture/best-practices-for-building-containers)
+- [google-github-actions/auth](https://github.com/google-github-actions/auth) — Workload Identity Federation reference
